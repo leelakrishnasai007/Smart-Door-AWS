@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Smart Door – Virtual Door</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg1: #0f172a;
+      --bg2: #1e293b;
+      --accent: #3b82f6;
+      --accent-soft: rgba(59, 130, 246, 0.08);
+      --success: #16a34a;
+      --error: #dc2626;
+      --text-main: #0f172a;
+      --text-muted: #6b7280;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
+      color: #e5e7eb;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .page {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-bar {
+      padding: 18px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    .logo {
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-mark {
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      background: radial-gradient(circle at 30% 20%, #60a5fa, #1d4ed8);
+      box-shadow: 0 0 16px rgba(96, 165, 250, 0.7);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.12);
+      color: #bbf7d0;
+      font-size: 11px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+    }
+
+    .main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 0;
+      padding: 0 32px 32px;
+    }
+
+    .panel {
+      background: #f9fafb;
+      border-radius: 24px;
+      padding: 32px 30px 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow:
+        0 32px 70px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(148, 163, 184, 0.3);
+    }
+
+    .panel-left {
+      margin-right: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .panel-left > div {
+      max-width: 460px;
+      margin: 0 auto;
+    }
+
+    .panel-right {
+      margin-left: 16px;
+      background: radial-gradient(circle at top, #0f172a, #020617);
+      color: #e5e7eb;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .panel-right::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.25), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .panel-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 4px;
+      color: var(--text-main);
+    }
+
+    .page-title {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .otp-input-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .otp-input {
+      flex: 1;
+      padding: 14px 14px;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      font-size: 22px;
+      letter-spacing: 0.1em;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.1s ease;
+      color: var(--text-main);
+      background: #ffffff;
+    }
+
+    .otp-input::placeholder {
+      color: #d1d5db;
+      letter-spacing: 0;
+      font-size: 16px;
+    }
+
+    .otp-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.18);
+      transform: translateY(-1px);
+    }
+
+    .action-btn {
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent);
+      color: #f9fafb;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+      box-shadow: 0 12px 28px rgba(59, 130, 246, 0.55);
+      transition: transform 0.1s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .action-btn:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 14px 32px rgba(37, 99, 235, 0.65);
+    }
+
+    .action-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.6);
+    }
+
+    .action-btn:disabled {
+      background: #cbd5f5;
+      color: #4b5563;
+      box-shadow: none;
+      transform: none;
+      cursor: default;
+    }
+
+    .loader {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 2px solid rgba(239, 246, 255, 0.7);
+      border-top-color: #eff6ff;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hint-row {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .status-strip {
+      margin-top: 22px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f3f4f6;
+      color: var(--text-muted);
+    }
+
+    .status-strip--success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-strip--error {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .status-icon {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .status-strip--success .status-icon { background: var(--success); }
+    .status-strip--error .status-icon { background: var(--error); }
+
+    .footnote {
+      margin-top: 18px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .door-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .door {
+      width: 190px;
+      height: 280px;
+      border-radius: 26px;
+      background: linear-gradient(160deg, rgba(15, 23, 42, 0.9), rgba(15, 118, 110, 0.1));
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      box-shadow:
+        0 26px 60px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(15, 23, 42, 0.8);
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .door-glow {
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at 20% 0, rgba(59, 130, 246, 0.35), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .door-inner {
+      position: relative;
+      z-index: 1;
+      padding: 22px 20px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+    }
+
+    .door-top-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #9ca3af;
+    }
+
+    .door-status {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #e5e7eb;
+    }
+
+    /* === LIGHT STATES (small dot) === */
+    .door-light {
+      align-self: flex-end;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: #f9fafb; /* idle: white */
+      box-shadow: 0 0 10px rgba(249, 250, 251, 0.9);
+      transition: background 0.18s ease, box-shadow 0.18s ease;
+    }
+    .door-light--waiting {
+      background: #facc15;
+      box-shadow: 0 0 14px rgba(250, 204, 21, 0.9);
+    }
+    .door-light--success {
+      background: #22c55e;
+      box-shadow: 0 0 14px rgba(34, 197, 94, 0.95);
+    }
+    .door-light--error {
+      background: #ef4444;
+      box-shadow: 0 0 14px rgba(248, 113, 113, 0.95);
+    }
+
+    .door-handle {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 2px solid rgba(148, 163, 184, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 6px;
+      box-shadow: 0 0 18px rgba(15, 23, 42, 0.9);
+      background: radial-gradient(circle at 30% 20%, #0b1120, #020617);
+    }
+
+    /* === BIG CIRCLE STATES === */
+    .door-handle-inner {
+      width: 18px;
+      height: 18px;
+      border-radius: inherit;
+      background: #f9fafb; /* idle: white */
+      box-shadow: 0 0 10px rgba(249, 250, 251, 0.9);
+      transition: background 0.18s ease, box-shadow 0.18s ease;
+    }
+    .door-handle-inner--waiting {
+      background: #facc15;
+      box-shadow: 0 0 14px rgba(250, 204, 21, 0.9);
+    }
+    .door-handle-inner--success {
+      background: #22c55e;
+      box-shadow: 0 0 14px rgba(34, 197, 94, 0.95);
+    }
+    .door-handle-inner--error {
+      background: #ef4444;
+      box-shadow: 0 0 14px rgba(248, 113, 113, 0.95);
+    }
+
+    .door-badge {
+      font-size: 11px;
+      color: #9ca3af;
+      border-radius: 999px;
+      padding: 4px 9px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      align-self: flex-start;
+      margin-top: 10px;
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .door-footer {
+      font-size: 10px;
+      color: #6b7280;
+      max-width: 150px;
+    }
+
+    .door--error {
+      border-color: rgba(239, 68, 68, 0.9);
+      box-shadow:
+        0 26px 60px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(127, 29, 29, 0.8);
+    }
+
+    .door--success {
+      border-color: rgba(34, 197, 94, 0.9);
+      box-shadow:
+        0 26px 60px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(22, 163, 74, 0.8);
+    }
+
+    @media (max-width: 900px) {
+      .main {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 0 20px 24px;
+      }
+      .panel-left, .panel-right {
+        margin: 0 0 18px;
+      }
+      .panel-left > div {
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .top-bar {
+        padding: 12px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .panel {
+        padding: 22px 18px 18px;
+      }
+      h1 {
+        font-size: 24px;
+      }
+      .otp-input {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="top-bar">
+      <div class="logo">
+        <div class="logo-mark"></div>
+        <span>Smart&nbsp;Door</span>
+      </div>
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        <span>Virtual door online</span>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- Left side: form -->
+      <section class="panel panel-left">
+        <div>
+          <h1 class="page-title">Smart - Virtual Door</h1>
+          <p class="subtitle">
+            Enter the one-time passcode sent to you. Each code is valid for five minutes
+            and can only be used once.
+          </p>
+
+          <div class="label">One-Time Passcode</div>
+
+          <div class="otp-input-row">
+            <input
+              id="otp"
+              class="otp-input"
+              type="text"
+              maxlength="6"
+              placeholder="Enter 6-digit code"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+            />
+            <button class="action-btn" id="openBtn" onclick="submitOtp()">
+              <span id="btnText">Open door</span>
+              <span id="btnSpinner" class="loader" style="display:none;"></span>
+            </button>
+          </div>
+
+          <div class="hint-row">
+            Tip: you can also press <strong>Enter</strong> to submit.
+          </div>
+
+          <div id="status" class="status-strip">
+            <span class="status-icon"></span>
+            <span>Waiting for you to enter the passcode.</span>
+          </div>
+
+          <div class="footnote">
+            For security, remember to close the video stream when you’re done testing this project.
+          </div>
+        </div>
+      </section>
+
+      <!-- Right side: visual door -->
+      <section class="panel panel-right">
+        <div class="panel-content">
+          <div class="door-wrapper">
+            <div class="door" id="doorVisual">
+              <div class="door-glow"></div>
+              <div class="door-inner">
+                <div>
+                  <div class="door-top-label">FRONT ENTRANCE</div>
+                  <div class="door-status" id="doorStatusText">
+                    Door locked · Code required
+                  </div>
+                </div>
+
+                <div>
+                  <div class="door-light" id="doorLight"></div>
+                  <div class="door-handle">
+                    <div class="door-handle-inner" id="doorHandleInner"></div>
+                  </div>
+                  <div class="door-badge" id="doorBadge">
+                    Awaiting OTP
+                  </div>
+                </div>
+
+                <div class="door-footer">
+                  SmartDoor Project · Rekognition · Kinesis · DynamoDB · Lambda
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ====== CONFIG: your verify-otp API URL ======
+    const API_URL = "https://f6appkxbng.execute-api.us-east-1.amazonaws.com/verify-otp";
+
+    const otpInput = document.getElementById("otp");
+    const statusStrip = document.getElementById("status");
+    const statusText = statusStrip.querySelector("span:nth-child(2)");
+    const openBtn = document.getElementById("openBtn");
+    const btnText = document.getElementById("btnText");
+    const btnSpinner = document.getElementById("btnSpinner");
+    const doorVisual = document.getElementById("doorVisual");
+    const doorStatusText = document.getElementById("doorStatusText");
+    const doorBadge = document.getElementById("doorBadge");
+    const doorLight = document.getElementById("doorLight");
+    const doorHandleInner = document.getElementById("doorHandleInner");
+
+    function setStrip(message, type) {
+      statusText.textContent = message;
+      statusStrip.className = "status-strip";
+      if (type === "success") {
+        statusStrip.classList.add("status-strip--success");
+      } else if (type === "error") {
+        statusStrip.classList.add("status-strip--error");
+      }
+    }
+
+    function setDoorLight(mode) {
+      doorLight.className = "door-light";
+      if (mode === "waiting") {
+        doorLight.classList.add("door-light--waiting");
+      } else if (mode === "success") {
+        doorLight.classList.add("door-light--success");
+      } else if (mode === "error") {
+        doorLight.classList.add("door-light--error");
+      }
+      // default: white
+    }
+
+    function setDoorHandle(mode) {
+      doorHandleInner.className = "door-handle-inner";
+      if (mode === "waiting") {
+        doorHandleInner.classList.add("door-handle-inner--waiting");
+      } else if (mode === "success") {
+        doorHandleInner.classList.add("door-handle-inner--success");
+      } else if (mode === "error") {
+        doorHandleInner.classList.add("door-handle-inner--error");
+      }
+      // default: white
+    }
+
+    function setDoorState(state, extra) {
+      doorVisual.classList.remove("door--success", "door--error");
+
+      if (state === "success") {
+        doorVisual.classList.add("door--success");
+        doorStatusText.textContent = "Door unlocked · Access granted";
+        doorBadge.textContent = extra || "Welcome";
+        setDoorLight("success");
+        setDoorHandle("success");
+      } else if (state === "error") {
+        doorVisual.classList.add("door--error");
+        doorStatusText.textContent = "Access denied · Invalid code";
+        doorBadge.textContent = "Try again";
+        setDoorLight("error");
+        setDoorHandle("error");
+      } else if (state === "pending") {
+        doorStatusText.textContent = "Checking code…";
+        doorBadge.textContent = "Checking…";
+        setDoorLight("waiting");
+        setDoorHandle("waiting");
+      } else {
+        // locked / idle
+        doorStatusText.textContent = "Door locked · Code required";
+        doorBadge.textContent = "Awaiting OTP";
+        setDoorLight("idle");
+        setDoorHandle("idle");
+      }
+    }
+
+    function setLoading(isLoading) {
+      openBtn.disabled = isLoading;
+      if (isLoading) {
+        btnText.textContent = "Checking…";
+        btnSpinner.style.display = "inline-block";
+      } else {
+        btnText.textContent = "Open door";
+        btnSpinner.style.display = "none";
+      }
+    }
+
+    async function submitOtp() {
+      const otp = otpInput.value.trim();
+
+      if (!otp || otp.length < 4) {
+        setStrip("Please enter the 6-digit passcode.", "error");
+        setDoorState("error");
+        otpInput.focus();
+        return;
+      }
+
+      setLoading(true);
+      setStrip("Contacting server…", null);
+      setDoorState("pending");
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ otp })
+        });
+
+        const data = await res.json();
+
+        if (data.valid) {
+          const name = data.name || "Visitor";
+          setStrip("Hello, " + name + "! The door is now unlocked.", "success");
+          setDoorState("success", name);
+        } else {
+          setStrip("Permission denied. The passcode is invalid or expired.", "error");
+          setDoorState("error");
+        }
+      } catch (err) {
+        console.error(err);
+        setStrip("Error contacting server. Check your API and try again.", "error");
+        setDoorState("error");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    otpInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        submitOtp();
+      }
+    });
+
+    window.addEventListener("load", () => {
+      otpInput.focus();
+      setStrip("Waiting for you to enter the passcode.", null);
+      setDoorState("locked"); // white lights on first load
+    });
+  </script>
+</body>
+</html>

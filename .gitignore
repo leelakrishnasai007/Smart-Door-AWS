@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+
+# Mac
+.DS_Store
+
+# AWS and credentials
+*.pem
+*.pfx
+*.p12
+*.key
+*.crt
+*.cer
+.aws/
+credentials
+.env
+*.log
+
+# Don’t commit packaged deployment zips
+*.zip
+
+# Any screenshots that might contain keys
+screenshots_raw/

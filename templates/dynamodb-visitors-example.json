@@ -1,0 +1,12 @@
+{
+  "faceId": "example-face-id-1234",
+  "name": "Sample User",
+  "phoneNumber": "+10000000000",
+  "photos": [
+    {
+      "bucket": "example-bucket",
+      "objectKey": "sample-image.jpg",
+      "createdTimestamp": "2025-01-01T12:00:00"
+    }
+  ]
+}

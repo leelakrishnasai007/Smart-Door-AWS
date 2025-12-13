@@ -1,0 +1,20 @@
+{
+  "Name": "streamProcessorForBlog",
+  "Input": {
+    "KinesisVideoStream": {
+      "Arn": "arn:aws:kinesisvideo:REGION:ACCOUNT_ID:stream/kvs1-smartdoor-leela/123456789"
+    }
+  },
+  "Output": {
+    "KinesisDataStream": {
+      "Arn": "arn:aws:kinesis:REGION:ACCOUNT_ID:stream/kds1-smartdoor-leela"
+    }
+  },
+  "RoleArn": "arn:aws:iam::ACCOUNT_ID:role/RekognitionStreamProcessorRole",
+  "Settings": {
+    "FaceSearch": {
+      "CollectionId": "smartdoor-visitors",
+      "FaceMatchThreshold": 85
+    }
+  }
+}

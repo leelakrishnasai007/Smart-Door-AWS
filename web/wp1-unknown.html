@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Smart Door – Unknown Visitor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg1: #020617;
+      --bg2: #0f172a;
+      --accent: #3b82f6;
+      --accent-soft: rgba(59, 130, 246, 0.12);
+      --success: #16a34a;
+      --error: #dc2626;
+      --text-main: #0f172a;
+      --text-muted: #6b7280;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
+      color: #e5e7eb;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .page {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top bar */
+
+    .top-bar {
+      padding: 18px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+
+    .logo {
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-mark {
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      background: radial-gradient(circle at 30% 20%, #60a5fa, #1d4ed8);
+      box-shadow: 0 0 16px rgba(96, 165, 250, 0.7);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.12);
+      color: #bfdbfe;
+      font-size: 11px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #60a5fa;
+      box-shadow: 0 0 12px rgba(96, 165, 250, 0.9);
+    }
+
+    /* Main layout */
+
+    .main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 0 32px 32px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 880px;
+      background: #f9fafb;
+      color: var(--text-main);
+      border-radius: 24px;
+      padding: 32px 30px 26px;
+      box-shadow:
+        0 32px 70px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(148, 163, 184, 0.35);
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      gap: 32px;
+    }
+
+    @media (max-width: 900px) {
+      .main {
+        padding: 0 20px 24px;
+      }
+      .card {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 24px 20px 20px;
+      }
+    }
+
+    /* Left column (form) */
+
+    .form-section h1 {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      max-width: 460px;
+    }
+
+    .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .input,
+    .textarea {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      padding: 12px 12px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.1s ease;
+      color: var(--text-main);
+      background: #ffffff;
+      resize: vertical;
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: #d1d5db;
+    }
+
+    .input:focus,
+    .textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .action-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .btn-primary {
+      padding: 11px 20px;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent);
+      color: #f9fafb;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+      box-shadow: 0 12px 28px rgba(59, 130, 246, 0.55);
+      transition: transform 0.1s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 14px 32px rgba(37, 99, 235, 0.65);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.6);
+    }
+
+    .btn-primary:disabled {
+      background: #cbd5f5;
+      color: #4b5563;
+      box-shadow: none;
+      transform: none;
+      cursor: default;
+    }
+
+    .loader {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 2px solid rgba(239, 246, 255, 0.7);
+      border-top-color: #eff6ff;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hint {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .status-strip {
+      margin-top: 18px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f3f4f6;
+      color: var(--text-muted);
+    }
+
+    .status-strip--success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-strip--error {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .status-icon {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .status-strip--success .status-icon { background: var(--success); }
+    .status-strip--error .status-icon { background: var(--error); }
+
+    /* Right column – info card */
+
+    .info-section {
+      background: radial-gradient(circle at top, #0f172a, #020617);
+      border-radius: 20px;
+      padding: 22px 20px;
+      color: #e5e7eb;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow:
+        0 26px 60px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(15, 23, 42, 0.75);
+    }
+
+    .info-section::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.3), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .info-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* centered label */
+    .pill-label {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      text-align: left;
+      display: block;
+    }
+
+    /* nicer spacing / typography here */
+    .info-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 8px;
+      margin-bottom: 12px; /* extra space before body */
+      text-align: left;
+    }
+
+    .info-body {
+      font-size: 13px;
+      line-height: 1.55;
+      color: #9ca3af;
+      max-width: 260px;
+      margin-top: 2px;
+    }
+
+    .steps {
+      list-style: none;
+      margin-top: 4px;
+      font-size: 12px;
+      color: #e5e7eb;
+    }
+
+    .steps li {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .step-bullet {
+      margin-top: 3px;
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: #60a5fa;
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.9);
+      flex-shrink: 0;
+    }
+
+    .mini-tag {
+      align-self: flex-start;
+      margin-top: 10px;
+      font-size: 11px;
+      border-radius: 999px;
+      padding: 4px 9px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.7);
+      color: #e5e7eb;
+    }
+
+    .tech-footnote {
+      position: relative;
+      z-index: 1;
+      margin-top: 14px;
+      font-size: 10px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="top-bar">
+      <div class="logo">
+        <div class="logo-mark"></div>
+        <span>Smart&nbsp;Door</span>
+      </div>
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        <span>Unknown visitor workflow</span>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="card">
+        <!-- LEFT: form -->
+        <div class="form-section">
+          <h1>Unknown Visitor</h1>
+          <p class="subtitle">
+            Approve a one-time guest by generating a temporary access code.
+            The OTP will be emailed to you for use on the Virtual Door page.
+          </p>
+
+          <div class="field">
+            <div class="label">Visitor name</div>
+            <input
+              id="name"
+              class="input"
+              type="text"
+              placeholder="E.g., Alex (food delivery), Sam (friend)..."
+            />
+          </div>
+
+          <div class="field">
+            <div class="label">Note (optional)</div>
+            <textarea
+              id="note"
+              class="textarea"
+              rows="3"
+              placeholder="Any extra context you want to remember about this visit."
+            ></textarea>
+          </div>
+
+          <div class="action-row">
+            <button class="btn-primary" id="submitBtn" onclick="submitForm()">
+              <span id="btnText">Generate OTP</span>
+              <span id="btnSpinner" class="loader" style="display:none;"></span>
+            </button>
+            <div class="hint">
+              The OTP is valid for five minutes and can be used once.
+            </div>
+          </div>
+
+          <div id="status" class="status-strip">
+            <span class="status-icon"></span>
+            <span>Fill in the details and generate a one-time passcode.</span>
+          </div>
+        </div>
+
+        <!-- RIGHT: info / explanation -->
+        <aside class="info-section">
+          <div class="info-inner">
+            <div>
+              <div class="pill-label">FRONT ENTRANCE · UNKNOWN VISITOR</div>
+              <div class="info-title">Manually approve your guest</div>
+              <p class="info-body">
+                1.   When Rekognition spots new people,<br />
+
+                2.  you’ll get an email with a link to this page. <br />
+                
+                3.. Use it to create a short-lived OTP for that visitor.
+              </p>
+            </div>
+
+            <ul class="steps">
+              <li>
+                <span class="step-bullet"></span>
+                <span>Enter who the visitor is and any helpful note.</span>
+              </li>
+              <li>
+                <span class="step-bullet"></span>
+                <span>We write the OTP into DynamoDB and email it to you.</span>
+              </li>
+              <li>
+                <span class="step-bullet"></span>
+                <span>Share the code with your guest and unlock the door on the Virtual Door page.</span>
+              </li>
+            </ul>
+
+            <div class="mini-tag">
+              Rekognition · Kinesis · DynamoDB · Lambda · SNS
+            </div>
+          </div>
+
+          <div class="tech-footnote">
+            For your project write-up: this page calls the
+            <strong>/register-visitor</strong> HTTP API to create a passcode
+            record linked to this visit.
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ====== CONFIG: your existing API URL ======
+    const API_URL = "https://f6appkxbng.execute-api.us-east-1.amazonaws.com/register-visitor";
+    // ===========================================
+
+    const nameInput = document.getElementById("name");
+    const noteInput = document.getElementById("note");
+    const statusStrip = document.getElementById("status");
+    const statusIcon = statusStrip.querySelector(".status-icon");
+    const statusText = statusStrip.querySelector("span:nth-child(2)");
+    const submitBtn = document.getElementById("submitBtn");
+    const btnText = document.getElementById("btnText");
+    const btnSpinner = document.getElementById("btnSpinner");
+
+    function setStatus(message, type) {
+      statusText.textContent = message;
+      statusStrip.className = "status-strip";
+      if (type === "success") {
+        statusStrip.classList.add("status-strip--success");
+      } else if (type === "error") {
+        statusStrip.classList.add("status-strip--error");
+      }
+    }
+
+    function setLoading(isLoading) {
+      submitBtn.disabled = isLoading;
+      if (isLoading) {
+        btnText.textContent = "Generating…";
+        btnSpinner.style.display = "inline-block";
+      } else {
+        btnText.textContent = "Generate OTP";
+        btnSpinner.style.display = "none";
+      }
+    }
+
+    async function submitForm() {
+      const name = nameInput.value.trim();
+      const note = noteInput.value.trim();
+
+      if (!name) {
+        setStatus("Please enter the visitor's name.", "error");
+        nameInput.focus();
+        return;
+      }
+
+      setLoading(true);
+      setStatus("Contacting server…", null);
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, note })
+        });
+
+        const data = await response.json();
+
+        if (data.ok) {
+          setStatus(
+            "OTP generated and emailed to you. Use it on the Virtual Door page.",
+            "success"
+          );
+          nameInput.value = "";
+          noteInput.value = "";
+        } else {
+          setStatus("Failed to generate OTP. Check CloudWatch logs for details.", "error");
+        }
+      } catch (err) {
+        console.error(err);
+        setStatus("Error contacting server. Please try again.", "error");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        submitForm();
+      }
+    });
+
+    window.addEventListener("load", () => {
+      nameInput.focus();
+      setStatus("Fill in the details and generate a one-time passcode.", null);
+    });
+  </script>
+</body>
+</html>
