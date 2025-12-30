@@ -13,15 +13,15 @@ This project implements a cloud-based smart door system using:
 ## Smart Door Preview
 
 <p align="center">
-  <img src="images/Admin Access.png" width="900">
+  <img src="images/Admin_Access.png" width="900">
 </p>
 
 <p align="center">
-  <img src="images/UKV Web Page" width="900">
+  <img src="images/UKV_Web_Page.png" width="900">
 </p>
 
 <p align="center">
-  <img src="images/UKV Opened" width="900">
+  <img src="images/UKV_Opened.png" width="900">
 </p>
 
 
