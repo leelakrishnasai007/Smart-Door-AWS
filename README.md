@@ -46,7 +46,7 @@ This project implements a cloud-based smart door system using:
 - `diagrams/` – Architecture diagrams.
 - `docs/` – Project report and documentation.
 
-## How to Use (High-level)
+## How to Use
 
 1. Deploy the Lambda functions and configure IAM roles.
 2. Create and configure the Kinesis Video Stream, Kinesis Data Stream, and Rekognition stream processor.
