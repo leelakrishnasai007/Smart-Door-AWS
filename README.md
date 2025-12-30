@@ -10,6 +10,12 @@ This project implements a cloud-based smart door system using:
 - **Amazon SNS** for sending email notifications and OTPs
 - **Amazon S3** for hosting static web pages (unknown visitor approval page and virtual door page)
 
+## System Overview (architecture)
+
+<p align="center">
+  <img src="images/Archi Diagram.jpg" width="900">
+</p>
+
 ## Features
 
 - Detects known visitors using Rekognition face collection.
