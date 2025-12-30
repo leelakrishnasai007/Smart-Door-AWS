@@ -10,6 +10,21 @@ This project implements a cloud-based smart door system using:
 - **Amazon SNS** for sending email notifications and OTPs
 - **Amazon S3** for hosting static web pages (unknown visitor approval page and virtual door page)
 
+## Smart Door Preview
+
+<p align="center">
+  <img src="images/Admin Access.png" width="900">
+</p>
+
+<p align="center">
+  <img src="images/UKV Web Page" width="900">
+</p>
+
+<p align="center">
+  <img src="images/UKV Opened" width="900">
+</p>
+
+
 ## System Overview (architecture)
 
 <p align="center">
